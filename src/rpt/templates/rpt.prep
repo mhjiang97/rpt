@@ -1,0 +1,296 @@
+{{def(patient_name, sex, birth_date, tumor_type, specimen_site, collection_date, report_date, known_rearrangements, sv_burden, rearrangement_description)}}
+<!DOCTYPE document SYSTEM "rml.dtd">
+<document filename="rpt.pdf">
+    <template title="Report" author="Minghao Jiang" pageSize="595,842"
+        leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10">
+        <pageTemplate id="layout1">
+            <pageGraphics>
+                <!-- Header -->
+                <setFont name="Helvetica-Bold" size="12" />
+                <drawString x="20" y="820">Report on Structural Variants Identified through Long-read Whole Genome Sequencing</drawString>
+                <!-- Footer -->
+                <setFont name="Helvetica" size="8" />
+                <drawString x="500" y="30">Page <pageNumber /> of <getName id="lastPage"
+                        default="0" /></drawString>
+            </pageGraphics>
+            <frame id="hf" showBoundary="0" x1="15" y1="785" width="565" height="30" />
+            <frame id="ff" showBoundary="0" x1="20" y1="630" width="267.5" height="155" />
+            <frame id="sf" showBoundary="0" x1="317.5" y1="640" width="257.5" height="135" />
+            <frame id="bf" showBoundary="0" x1="15" y1="590" width="565" height="30" />
+            <frame id="bmf1" showBoundary="0" x1="20" y1="340" width="180" height="250" />
+            <frame id="bmf2" showBoundary="0" x1="205" y1="340" width="180" height="250" />
+            <frame id="bmf3" showBoundary="0" x1="390" y1="340" width="180" height="250" />
+            <frame id="gf" showBoundary="0" x1="15" y1="290" width="565" height="30" />
+            <frame id="gmf1" showBoundary="0" x1="20" y1="40" width="180" height="250" />
+            <frame id="gmf2" showBoundary="0" x1="205" y1="40" width="180" height="250" />
+            <frame id="gmf3" showBoundary="0" x1="390" y1="40" width="180" height="250" />
+        </pageTemplate>
+        <pageTemplate id="layout2">
+            <pageGraphics>
+                <setFont name="Helvetica" size="8" />
+                <drawString x="500" y="30">Page <pageNumber /> of <getName id="lastPage"
+                        default="0" /></drawString>
+            </pageGraphics>
+            <frame id="sgf" showBoundary="0" x1="15" y1="800" width="565" height="30" />
+            <frame id="sgmf1" showBoundary="0" x1="20" y1="550" width="180" height="250" />
+            <frame id="sgmf2" showBoundary="0" x1="205" y1="550" width="180" height="250" />
+            <frame id="sgmf3" showBoundary="0" x1="390" y1="550" width="180" height="250" />
+            <frame id="tf" showBoundary="0" x1="15" y1="500" width="565" height="30" />
+            <frame id="tmf1" showBoundary="0" x1="20" y1="250" width="180" height="250" />
+            <frame id="tmf2" showBoundary="0" x1="205" y1="250" width="180" height="250" />
+            <frame id="tmf3" showBoundary="0" x1="390" y1="250" width="180" height="250" />
+        </pageTemplate>
+    </template>
+    <stylesheet>
+        <paraStyle name="text" fontName="Helvetica" fontSize="10" leading="15" />
+        <blockTableStyle id="header">
+            <blockFont name="Helvetica-Bold" size="8" start="0,0" stop="2,0" />
+            <blockFont name="Helvetica" size="8" start="0,1" stop="-1,-1" />
+            <blockAlignment value="CENTER" />
+            <!-- <blockTopPadding length="10" start="0,1" stop="2,1" /> -->
+            <blockTextColor colorName="grey" start="0,0" stop="2,0" />
+        </blockTableStyle>
+        <blockTableStyle id="finding">
+            <blockFont name="Helvetica-Bold" size="10" start="0,0" stop="-1,-1" />
+            <blockAlignment value="CENTER" />
+            <blockTextColor colorName="white" start="0,0" stop="-1,-1" />
+            <blockBackground colorName="orange" start="0,0" stop="-1,-1" />
+        </blockTableStyle>
+        <blockTableStyle id="therapy">
+            <blockFont name="Helvetica-Bold" size="10" start="0,0" stop="-1,-1" />
+            <blockAlignment value="CENTER" />
+            <blockTextColor colorName="white" start="0,0" stop="-1,-1" />
+            <blockBackground colorName="#62b198" start="0,0" stop="-1,-1" />
+        </blockTableStyle>
+    </stylesheet>
+    <story>
+        <nextFrame name="hf" />
+        <blockTable style="header" rowHeights="15,15" align="RIGHT">
+            <tr>
+                <td>Patient Name</td>
+                <td>Tumor Type</td>
+                <td>Report Date</td>
+            </tr>
+            <tr>
+                <td>{{patient_name}}</td>
+                <td>{{tumor_type}}</td>
+                <td>{{report_date}}</td>
+            </tr>
+        </blockTable>
+        <nextFrame name="ff" />
+        <illustration width="267.5" height="5">
+            <fill color="#005066" />
+            <rect x="-5" y="0" width="272.5" height="5" fill="yes" />
+        </illustration>
+        <para style="text" spaceAfter="0" fontSize="12">
+            <b>PATIENT</b>
+        </para>
+        <illustration width="262.5" height="1">
+            <lineMode width="2" dash="1,2" />
+            <lines>0 0 262.5 0</lines>
+        </illustration>
+        <para style="text" spaceBefore="8">
+            <b>DISEASE</b> <font color="grey">{{tumor_type}}</font>
+        </para>
+        <para style="text">
+            <b>NAME</b> <font color="grey">{{patient_name}}</font>
+        </para>
+        <para style="text">
+            <b>DATE OF BIRTH</b> <font color="grey">{{birth_date}}</font>
+        </para>
+        <para style="text">
+            <b>SEX</b> <font color="grey">{{sex}}</font>
+        </para>
+        <para style="text" spaceAfter="0" fontSize="12" spaceBefore="8">
+            <b>SPECIMEN</b>
+        </para>
+        <illustration width="262.5" height="1">
+            <lineMode width="2" dash="1,2" />
+            <lines>0 0 262.5 0</lines>
+        </illustration>
+        <para style="text" spaceBefore="8">
+            <b>SPECIMEN SITE</b> <font color="grey">{{specimen_site}}</font>
+        </para>
+        <para style="text">
+            <b>DATE OF COLLECTION</b> <font color="grey">{{collection_date}}</font>
+        </para>
+        <nextFrame name="sf" />
+        <illustration width="262.5" height="-10">
+            <stroke color="grey" />
+            <rect x="-10" y="0" width="272.5" height="-150" fill="no" stroke="yes" />
+        </illustration>
+        <para style="text" textColor="orange" fontSize="12" spaceAfter="8" spaceBefore="5">
+            Genomic Findings
+        </para>
+        <para style="text">
+            Known Gene Rearrangment - <b><i>{{known_rearrangements}}</i></b>
+        </para>
+        <para style="text" textColor="orange" fontSize="12" spaceAfter="8" spaceBefore="8">
+            Biomarker Findings
+        </para>
+        <para style="text">
+            Tumor Structural Variant Burden - <b>{{sv_burden}} Vars/Mb</b>
+        </para>
+        <nextFrame name="bf" />
+        <blockTable style="finding" align="RIGHT">
+            <tr>
+                <td>BIOMARKER FINDINGS</td>
+            </tr>
+        </blockTable>
+        <illustration width="565" height="5">
+            <fill color="#005066" />
+            <rect x="0" y="-5" width="565" height="5" fill="yes" />
+        </illustration>
+        <nextFrame name="bmf1" />
+        <para style="text" fontSize="12" spaceAfter="0">
+            <b>Tumor Structural Variant Burden</b>
+        </para>
+        <illustration width="180" height="1">
+            <lineMode width="2" dash="1,2" />
+            <lines>0 0 180 0</lines>
+        </illustration>
+        <para style="text" textColor="grey" fontSize="10" spaceBefore="8">
+            FINDING SUMMARY
+        </para>
+        <para style="text">
+            Tumor Structural Variant Burden refers to the total number or extent of structural
+            variants present within the genome of a tumor. Structural variants are significant
+            alterations in the DNA sequence, including deletions, duplications, inversions,
+            translocations, and insertions. These changes can profoundly affect gene function and
+            are often key drivers in the development and progression of cancer.
+        </para>
+        <para style="text">
+            Structural variant burden provides a measure of the cumulative impact of these genomic
+            alterations within a tumor. A high SV burden is commonly associated with genomic
+            instability, a hallmark of many cancers. This instability can lead to increased tumor
+            heterogeneity, influencing the tumor's behavior, including its potential for
+            aggressiveness, metastasis, and response to therapy.
+        </para>
+        <para style="text">
+            Understanding the structural variant burden is critical for tailoring cancer treatments.
+            Tumors with a high SV burden may exhibit different responses to therapies, such as
+            immunotherapy or treatments targeting DNA repair pathways. For instance, tumors with
+            defects in DNA repair mechanisms, such as those involving BRCA1/BRCA2, often have
+            elevated SV burdens and may respond to PARP inhibitors or other targeted therapies.
+            Therefore, assessing the SV burden not only provides insights into the biology of the
+            tumor but also supports more personalized and effective treatment strategies.
+        </para>
+        <nextFrame name="gf" />
+        <blockTable style="finding" align="RIGHT">
+            <tr>
+                <td>GENOMIC FINDINGS</td>
+            </tr>
+        </blockTable>
+        <illustration width="565" height="5">
+            <fill color="#005066" />
+            <rect x="0" y="-5" width="565" height="5" fill="yes" />
+        </illustration>
+        <nextFrame name="gmf1" />
+        <para style="text" fontSize="12" spaceAfter="0">
+            <b>Known Gene Rearrangement</b>
+        </para>
+        <illustration width="180" height="1">
+            <lineMode width="2" dash="1,2" />
+            <lines>0 0 180 0</lines>
+        </illustration>
+        <para style="text" textColor="grey" fontSize="10" spaceBefore="8">
+            FINDING SUMMARY
+        </para>
+        <para style="text">
+            Gene rearrangements, a specific type of structural variant, are particularly
+            well-studied in leukemia and play a critical role in its pathogenesis. These
+            rearrangements often result from chromosomal translocations, where segments of DNA are
+            exchanged between non-homologous chromosomes, leading to the formation of fusion genes.
+            These fusion genes can drive uncontrolled cell growth and survival, contributing to
+            leukemia development.
+        </para>
+        <para style="text">
+            The identification of gene rearrangements in leukemia has revolutionized diagnosis, risk
+            stratification, and treatment. Many of these rearrangements serve as diagnostic markers,
+            allowing for precise classification of leukemia subtypes. Additionally, they are
+            critical therapeutic targets. For example, the discovery of the BCR-ABL1 fusion gene led
+            to the development of TKIs, which have dramatically improved survival rates in CML.
+        </para>
+        <para style="text">
+            Assessing structural variants, including gene rearrangements, is now a standard part of
+            leukemia workups using sequencing and other molecular techniques.
+            These findings not only inform prognosis but also guide personalized treatment
+            strategies, ensuring that patients receive the most effective therapies for their
+            specific genetic alterations.
+        </para>
+        <setNextTemplate name="layout2" />
+        <nextFrame />
+        <blockTable style="finding" align="RIGHT">
+            <tr>
+                <td>GENOMIC FINDINGS</td>
+            </tr>
+        </blockTable>
+        <illustration width="565" height="5">
+            <fill color="#005066" />
+            <rect x="0" y="-5" width="565" height="5" fill="yes" />
+        </illustration>
+        <nextFrame name="sgmf1" />
+        <para style="text" fontSize="12" spaceAfter="0">
+            <b><i>{{known_rearrangements}}</i></b>
+        </para>
+        <illustration width="180" height="1">
+            <lineMode width="2" dash="1,2" />
+            <lines>0 0 180 0</lines>
+        </illustration>
+        <para style="text" textColor="grey" fontSize="10" spaceBefore="8">
+            FINDING SUMMARY
+        </para>
+        <para style="text">
+            {{rearrangement_description}}
+        </para>
+        <nextFrame name="tf" />
+        <blockTable style="therapy" align="RIGHT">
+            <tr>
+                <td>THERAPIES</td>
+            </tr>
+        </blockTable>
+        <illustration width="565" height="5">
+            <fill color="#005066" />
+            <rect x="0" y="-5" width="565" height="5" fill="yes" />
+        </illustration>
+        <nextFrame name="tmf1" />
+        <para style="text" fontSize="12" spaceAfter="0">
+            <b>Therapies Targeting Known Rearrangement</b>
+        </para>
+        <illustration width="180" height="1">
+            <lineMode width="2" dash="1,2" />
+            <lines>0 0 180 0</lines>
+        </illustration>
+        <para style="text" textColor="grey" fontSize="10" spaceBefore="8">
+            Menin-MLL Inhibitors
+        </para>
+        <para style="text">
+            The interaction between KMT2A (MLL) and its cofactor menin is critical for the oncogenic
+            activity of KMT2A fusions. Small-molecule inhibitors such as revumenib (SNDX-5613) and
+            ziftomenib (KO-539) disrupt this interaction, leading to the downregulation of KMT2A
+            fusion target genes. These inhibitors have shown promising results in preclinical models
+            and early-phase clinical trials, with evidence of efficacy in KMT2A-rearranged
+            leukemias.
+        </para>
+        <para style="text" textColor="grey" fontSize="10" spaceBefore="8">
+            DOT1L Inhibitors
+        </para>
+        <para style="text">
+            The histone methyltransferase DOT1L is recruited by KMT2A fusion proteins to mediate
+            aberrant H3K79 methylation and drive leukemogenic transcription. DOT1L inhibitors, such
+            as pinometostat (EPZ-5676), have shown selective activity against KMT2A-rearranged
+            leukemias in early-phase clinical trials, though challenges remain in achieving
+            sustained responses.
+        </para>
+        <para style="text" textColor="grey" fontSize="10" spaceBefore="8">
+            Immunotherapy
+        </para>
+        <para style="text">
+            Immunotherapeutic approaches, including CAR-T cells and bispecific T-cell engagers
+            (BiTEs) targeting CD19 or other B-ALL antigens, have shown efficacy in
+            relapsed/refractory B-ALL. While not specific to KMT2A::AFF1, these therapies provide an
+            additional option for patients with this high-risk subtype.
+        </para>
+        <namedString id="lastPage"><pageNumber /></namedString>
+    </story>
+</document>

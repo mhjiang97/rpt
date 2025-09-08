@@ -1,0 +1,2 @@
+include src/rpt/templates/rpt.prep
+include src/rpt/templates/descriptions.json

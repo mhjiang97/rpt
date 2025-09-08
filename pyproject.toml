@@ -1,0 +1,36 @@
+[project]
+name = "rpt"
+version = "0.1.0"
+description = "Generate a PDF report from VCFs produced by SMK_SV"
+authors = [
+    {name = "Minghao Jiang",email = "mjhk@connect.hku.hk"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pip>=25.2",
+    "polars>=1.32.3",
+    "preppy>=5.0.1",
+    "reportlab>=4.4.3",
+    "typer>=0.16.1",
+    "typing-extensions>=4.14.1",
+    "vcfpy>=0.13.8",
+]
+license = "GPL-3.0-or-later"
+
+[project.scripts]
+rpt = "rpt.cli:app"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.30.1",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rpt = ["*.prep", "*.json"]
