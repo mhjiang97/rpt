@@ -30,7 +30,7 @@ def find_known_rearrangement(snpeff_bnd):
             if all(g in lst for g in sv_known.split("::")):
                 return sv_known
 
-    return None
+    return "No known gene rearrangement detected"
 
 
 def calculate_sv_burden(survivor_dir, patient_name):
@@ -97,7 +97,12 @@ def generate_report(
 
     df_snpeff_bnd = pl.read_csv(path_snpeff_bnd, separator="\t")
     rearrangements_known = find_known_rearrangement(df_snpeff_bnd)
-    description_rearrangement = descriptions[rearrangements_known]
+
+    if rearrangements_known == "No known gene rearrangement detected":
+        description_rearrangement = "N/A"
+    else:
+        description_rearrangement = descriptions[rearrangements_known]
+
     burden_sv = calculate_sv_burden(survivor_dir, name_patient)
 
     text_rml = template.get(
