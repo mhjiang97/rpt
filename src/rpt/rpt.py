@@ -19,9 +19,10 @@ from . import NULLS, SCHEMA_OVERRIDES, SIZE_GENOME, SVS_KNOWN, TYPES_SV
 
 
 # %%
-def find_known_rearrangement(snpeff_bnd):
+def find_known_rearrangement(snpeff_bnd, translocation_IDS):
     genes = (
-        snpeff_bnd.filter(pl.col("EFFECT").str.contains("gene_fusion"))
+        snpeff_bnd.filter(pl.col("ID").is_in(translocation_IDS))
+        .filter(pl.col("EFFECT").str.contains("gene_fusion"))
         .select(["GENE"])
         .to_series()
         .unique()
@@ -52,6 +53,13 @@ def calculate_sv_burden(survivor_dir, patient_name):
     return burden_sv
 
 
+def get_translocation_IDs(BND_vcf):
+    df_bnd = ox.from_vcf(BND_vcf).pl()
+    ids = [_ids[0] for _ids in df_bnd["id"].to_list()]
+
+    return ids
+
+
 def extract_annotation(caller_names, pipeline_work_dir, patient_name):
     dfs = []
     for caller in caller_names:
@@ -79,6 +87,54 @@ def extract_annotation(caller_names, pipeline_work_dir, patient_name):
     return df_merged
 
 
+def get_description(rearrangement):
+    path_descriptions = files("rpt.templates").joinpath("descriptions.json")
+
+    with open(path_descriptions) as f:
+        descriptions = json.load(f)
+
+    if rearrangement in descriptions:
+        return descriptions[rearrangement]
+    else:
+        return "N/A"
+
+
+def create_pdf_report(
+    sample_table,
+    patient_name,
+    sv_burden,
+    known_rearrangement,
+    output_pdf,
+):
+    df_sample = pl.read_csv(sample_table)
+    index_patient = df_sample["sample_name"].to_list().index(patient_name)
+    diagnosis = df_sample["diagnosis"][index_patient]
+    date_birth = df_sample["birth_date"][index_patient]
+    sex = df_sample["gender"][index_patient]
+    site_specimen = df_sample["specimen"][index_patient]
+    date_collection = df_sample["collection_date"][index_patient]
+    date_report = datetime.now().strftime("%d-%b-%Y")
+
+    description_rearrangement = get_description(known_rearrangement)
+
+    path_template = files("rpt.templates").joinpath("rpt.prep")
+    template = preppy.getModule(path_template)
+    text_rml = template.get(
+        patient_name,
+        sex,
+        date_birth,
+        diagnosis,
+        site_specimen,
+        date_collection,
+        date_report,
+        known_rearrangement,
+        sv_burden,
+        description_rearrangement,
+    )
+
+    rml2pdf.go(text_rml, outputFileName=output_pdf)
+
+
 # %%
 arg_out_dir = Annotated[
     Path, typer.Option(dir_okay=True, resolve_path=True, help="Output directory")
@@ -95,7 +151,7 @@ arg_sample_table = Annotated[
 
 
 # %%
-def generate_report(
+def main(
     out_dir: arg_out_dir = "tests/output",
     survivor_dir: arg_survivor_dir = "tests/data/survivor/GYB",
     callers: arg_callers = ["cutesv", "sniffles", "svim", "severus", "svision"],
@@ -107,51 +163,18 @@ def generate_report(
     path_run = survivor_dir.parent.parent
     path_out = Path(f"{out_dir}/{name_patient}.pdf")
 
-    path_template = files("rpt.templates").joinpath("rpt.prep")
-    path_descriptions = files("rpt.templates").joinpath("descriptions.json")
-    template = preppy.getModule(path_template)
-    with open(path_descriptions) as f:
-        descriptions = json.load(f)
+    ids = get_translocation_IDs(path_vcf_bnd)
+    df_bnd = extract_annotation(callers, path_run, name_patient)
+    rearrangement = find_known_rearrangement(df_bnd, ids)
+    burden = calculate_sv_burden(survivor_dir, name_patient)
 
-    df_vcf: pl.DataFrame = ox.from_vcf(path_vcf_bnd).pl()
-    ids = [_ids[0] for _ids in df_vcf["id"].to_list()]
-
-    df_snpeff_bnd = extract_annotation(callers, path_run, name_patient).filter(
-        pl.col("ID").is_in(ids)
+    create_pdf_report(
+        sample_table=sample_table,
+        patient_name=name_patient,
+        sv_burden=burden,
+        known_rearrangement=rearrangement,
+        output_pdf=path_out.as_posix(),
     )
-    rearrangements_known = find_known_rearrangement(df_snpeff_bnd)
-
-    if rearrangements_known == "No known gene rearrangement detected":
-        description_rearrangement = "N/A"
-    else:
-        description_rearrangement = descriptions[rearrangements_known]
-
-    df_sample = pl.read_csv(sample_table)
-    index_patient = df_sample["sample_name"].to_list().index(name_patient)
-
-    diagnosis = df_sample["diagnosis"][index_patient]
-    date_birth = df_sample["birth_date"][index_patient]
-    sex = df_sample["gender"][index_patient]
-    site_specimen = df_sample["specimen"][index_patient]
-    date_collection = df_sample["collection_date"][index_patient]
-    date_report = datetime.now().strftime("%d-%b-%Y")
-
-    burden_sv = calculate_sv_burden(survivor_dir, name_patient)
-
-    text_rml = template.get(
-        name_patient,
-        sex,
-        date_birth,
-        diagnosis,
-        site_specimen,
-        date_collection,
-        date_report,
-        rearrangements_known,
-        burden_sv,
-        description_rearrangement,
-    )
-
-    rml2pdf.go(text_rml, outputFileName=path_out.as_posix())
 
 
 # %%

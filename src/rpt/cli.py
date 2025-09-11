@@ -1,9 +1,9 @@
 import typer
 
-from .rpt import generate_report
+from .rpt import main
 
 app = typer.Typer()
-app.command()(generate_report)
+app.command()(main)
 
 if __name__ == "__main__":
     app()
