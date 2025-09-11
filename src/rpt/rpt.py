@@ -13,7 +13,7 @@ import typer
 from rlextra.rml2pdf import rml2pdf
 from typing_extensions import Annotated
 
-from . import SVS_KNOWN, SIZE_GENOME
+from . import SIZE_GENOME, SVS_KNOWN
 
 
 # %%
