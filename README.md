@@ -41,6 +41,7 @@ After running [smk_sv](https://github.com/jasonwong-lab/smk_sv.git), generate a 
 rpt \
     --out-dir <output_directory> \
     --survivor-dir <survivor_directory> \
+    --callers <caller_a> --callers <caller_b> ... \
     --sample-table <sample_table.csv>
 ```
 
@@ -48,6 +49,7 @@ rpt \
 
 - `--out-dir`: Directory to save the generated report
 - `--survivor-dir`: Path to SURVIVOR output directory containing `final/` subdirectory with merged VCF files and annotated TSV files
+- `--callers`: List of SV callers used in the smk_sv pipeline (*e.g.*, `cutesv`, `sniffles`, `svim`, `severus`, `svision`)
 - `--sample-table`: CSV file with sample information
 
 ### Sample Table Format
