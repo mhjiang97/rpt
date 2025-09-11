@@ -13,6 +13,8 @@ import typer
 from rlextra.rml2pdf import rml2pdf
 from typing_extensions import Annotated
 
+from . import SVS_KNOWN, SIZE_GENOME
+
 
 # %%
 def find_known_rearrangement(snpeff_bnd):
@@ -44,8 +46,7 @@ def calculate_sv_burden(survivor_dir, patient_name):
         for sv, cmd in cmds.items()
     }
     count_total = sum(counts.values())
-    size_genome = 3000  # Mb
-    burden_sv = round(count_total / size_genome, 2)
+    burden_sv = round(count_total / SIZE_GENOME, 2)
 
     return burden_sv
 
@@ -60,10 +61,6 @@ arg_survivor_dir = Annotated[
 arg_sample_table = Annotated[
     Path, typer.Option(exists=True, help="Path to sample table")
 ]
-
-
-# %%
-SVS_KNOWN = ("KMT2A::AFF1",)
 
 
 # %%
