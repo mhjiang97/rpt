@@ -2,10 +2,11 @@
 
 # %%
 import json
-import subprocess as sp
 from datetime import datetime
 from importlib.resources import files
 from pathlib import Path
+from typing import Annotated
+from xml.sax.saxutils import escape
 
 import oxbow as ox
 import polars as pl
@@ -13,7 +14,6 @@ import polars.selectors as cs
 import preppy
 import typer
 from rlextra.rml2pdf import rml2pdf
-from typing_extensions import Annotated
 
 from . import NULLS, SCHEMA_OVERRIDES, SIZE_GENOME, SVS_KNOWN, TYPES_SV
 
@@ -35,19 +35,17 @@ def find_known_rearrangement(snpeff_bnd, translocation_IDS):
             if all(g in lst for g in sv_known.split("::")):
                 return sv_known
 
-    return "No known gene rearrangement detected"
+    return None
 
 
 def calculate_sv_burden(survivor_dir, patient_name):
     vcfs = {
         sv: f"{survivor_dir}/final/{patient_name}.{sv}.merged.vcf" for sv in TYPES_SV
     }
-    cmds = {sv: f"grep -v '^#' {vcf} | wc -l" for sv, vcf in vcfs.items()}
-    counts = {
-        sv: int(sp.run(cmd, shell=True, capture_output=True, text=True).stdout.strip())
-        for sv, cmd in cmds.items()
-    }
-    count_total = sum(counts.values())
+    count_total = 0
+    for vcf in vcfs.values():
+        with open(vcf) as f:
+            count_total += sum(1 for line in f if not line.startswith("#"))
     burden_sv = round(count_total / SIZE_GENOME, 2)
 
     return burden_sv
@@ -88,15 +86,17 @@ def extract_annotation(caller_names, pipeline_work_dir, patient_name):
 
 
 def get_description(rearrangement):
+    """Return the description paragraphs and therapies for a rearrangement."""
     path_descriptions = files("rpt.templates").joinpath("descriptions.json")
 
     with open(path_descriptions) as f:
         descriptions = json.load(f)
 
-    if rearrangement in descriptions:
-        return descriptions[rearrangement]
-    else:
-        return "N/A"
+    return descriptions.get(rearrangement, {"description": [], "therapies": []})
+
+
+def _quote_xml(value):
+    return escape(str(value))
 
 
 def create_pdf_report(
@@ -106,30 +106,30 @@ def create_pdf_report(
     known_rearrangement,
     output_pdf,
 ):
-    df_sample = pl.read_csv(sample_table)
-    index_patient = df_sample["sample_name"].to_list().index(patient_name)
-    diagnosis = df_sample["diagnosis"][index_patient]
-    date_birth = df_sample["birth_date"][index_patient]
-    sex = df_sample["gender"][index_patient]
-    site_specimen = df_sample["specimen"][index_patient]
-    date_collection = df_sample["collection_date"][index_patient]
-    date_report = datetime.now().strftime("%d-%b-%Y")
+    df_sample = pl.read_csv(sample_table, infer_schema=False).filter(
+        pl.col("sample_name") == patient_name
+    )
+    if df_sample.is_empty():
+        raise ValueError(f"Sample {patient_name!r} not found in {sample_table}")
+    sample = df_sample.row(0, named=True)
 
-    description_rearrangement = get_description(known_rearrangement)
+    knowledge = get_description(known_rearrangement)
 
     path_template = files("rpt.templates").joinpath("rpt.prep")
-    template = preppy.getModule(path_template)
+    template = preppy.getModule(str(path_template), savePyc=False)
     text_rml = template.get(
-        patient_name,
-        sex,
-        date_birth,
-        diagnosis,
-        site_specimen,
-        date_collection,
-        date_report,
-        known_rearrangement,
-        sv_burden,
-        description_rearrangement,
+        patient_name=patient_name,
+        sex=sample["gender"],
+        birth_date=sample["birth_date"],
+        tumor_type=sample["diagnosis"],
+        specimen_site=sample["specimen"],
+        collection_date=sample["collection_date"],
+        report_date=datetime.now().strftime("%d-%b-%Y"),
+        known_rearrangement=known_rearrangement,
+        sv_burden=sv_burden,
+        rearrangement_description=knowledge["description"],
+        therapies=knowledge["therapies"],
+        __quoteFunc__=_quote_xml,
     )
 
     rml2pdf.go(text_rml, outputFileName=output_pdf)
@@ -142,8 +142,13 @@ arg_out_dir = Annotated[
 arg_survivor_dir = Annotated[
     Path, typer.Option(exists=True, help="Path to SURVIVOR directory")
 ]
+DEFAULT_CALLERS = ("cutesv", "sniffles", "svim", "severus", "svision")
 arg_callers = Annotated[
-    list[str], typer.Option(help="SV callers used in the smk_sv pipeline")
+    list[str] | None,
+    typer.Option(
+        help="SV callers used in the smk_sv pipeline",
+        show_default=", ".join(DEFAULT_CALLERS),
+    ),
 ]
 arg_sample_table = Annotated[
     Path, typer.Option(exists=True, help="Path to sample table")
@@ -154,9 +159,11 @@ arg_sample_table = Annotated[
 def main(
     out_dir: arg_out_dir = "tests/output",
     survivor_dir: arg_survivor_dir = "tests/data/survivor/GYB",
-    callers: arg_callers = ["cutesv", "sniffles", "svim", "severus", "svision"],
+    callers: arg_callers = None,
     sample_table: arg_sample_table = "tests/data/sample_info.csv",
 ):
+    if not callers:
+        callers = list(DEFAULT_CALLERS)
     out_dir.mkdir(parents=True, exist_ok=True)
     name_patient = survivor_dir.name
     path_vcf_bnd = f"{survivor_dir}/final/{name_patient}.BND.merged.vcf"

@@ -1,3 +1,23 @@
 {
-    "KMT2A::AFF1": "The KMT2A::AFF1 fusion is a well-characterized genetic abnormality associated with B-cell Acute Lymphoblastic Leukemia (B-ALL). This fusion results from a chromosomal translocation, most commonly t(4;11)(q21;q23), where the KMT2A gene (lysine methyltransferase 2A, located on 11q23) fuses with the AFF1 gene (AF4/FMR2 family member 1, located on 4q21).\n\nThe KMT2A::AFF1 fusion is frequently observed in infant B-ALL, accounting for a significant proportion of cases in this age group. It is also found, though less commonly, in older children and adults with B-ALL. This genetic rearrangement is associated with high-risk disease features, including aggressive clinical behavior, high leukocyte counts at diagnosis, and early central nervous system (CNS) involvement. Patients with this fusion typically have a poor prognosis compared to other subtypes of B-ALL, with lower overall survival rates despite intensive chemotherapy. However, outcomes may vary depending on the age of the patient, treatment protocols, and the presence of other prognostic factors.\n\nCurrent treatment regimens often involve intensive chemotherapy and consideration of hematopoietic stem cell transplantation (HSCT) in first remission for high-risk patients. Novel therapeutic approaches targeting the KMT2A fusion protein or its downstream pathways, such as menin inhibitors and epigenetic modulators, are under investigation in clinical trials and may offer new hope for patients with this fusion."
+    "KMT2A::AFF1": {
+        "description": [
+            "The KMT2A::AFF1 fusion is a well-characterized genetic abnormality associated with B-cell Acute Lymphoblastic Leukemia (B-ALL). This fusion results from a chromosomal translocation, most commonly t(4;11)(q21;q23), where the KMT2A gene (lysine methyltransferase 2A, located on 11q23) fuses with the AFF1 gene (AF4/FMR2 family member 1, located on 4q21).",
+            "The KMT2A::AFF1 fusion is frequently observed in infant B-ALL, accounting for a significant proportion of cases in this age group. It is also found, though less commonly, in older children and adults with B-ALL. This genetic rearrangement is associated with high-risk disease features, including aggressive clinical behavior, high leukocyte counts at diagnosis, and early central nervous system (CNS) involvement. Patients with this fusion typically have a poor prognosis compared to other subtypes of B-ALL, with lower overall survival rates despite intensive chemotherapy. However, outcomes may vary depending on the age of the patient, treatment protocols, and the presence of other prognostic factors.",
+            "Current treatment regimens often involve intensive chemotherapy and consideration of hematopoietic stem cell transplantation (HSCT) in first remission for high-risk patients. Novel therapeutic approaches targeting the KMT2A fusion protein or its downstream pathways, such as menin inhibitors and epigenetic modulators, are under investigation in clinical trials and may offer new hope for patients with this fusion."
+        ],
+        "therapies": [
+            {
+                "name": "Menin-MLL Inhibitors",
+                "text": "The interaction between KMT2A (MLL) and its cofactor menin is critical for the oncogenic activity of KMT2A fusions. Small-molecule inhibitors such as revumenib (SNDX-5613) and ziftomenib (KO-539) disrupt this interaction, leading to the downregulation of KMT2A fusion target genes. These inhibitors have shown promising results in preclinical models and early-phase clinical trials, with evidence of efficacy in KMT2A-rearranged leukemias."
+            },
+            {
+                "name": "DOT1L Inhibitors",
+                "text": "The histone methyltransferase DOT1L is recruited by KMT2A fusion proteins to mediate aberrant H3K79 methylation and drive leukemogenic transcription. DOT1L inhibitors, such as pinometostat (EPZ-5676), have shown selective activity against KMT2A-rearranged leukemias in early-phase clinical trials, though challenges remain in achieving sustained responses."
+            },
+            {
+                "name": "Immunotherapy",
+                "text": "Immunotherapeutic approaches, including CAR-T cells and bispecific T-cell engagers (BiTEs) targeting CD19 or other B-ALL antigens, have shown efficacy in relapsed/refractory B-ALL. While not specific to KMT2A::AFF1, these therapies provide an additional option for patients with this high-risk subtype."
+            }
+        ]
+    }
 }
