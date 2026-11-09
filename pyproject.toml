@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "rpt"
 version = "0.1.0"
@@ -9,13 +13,13 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "oxbow>=0.4.1",
-    "pip>=25.2",
     "polars>=1.32.3",
     "preppy>=5.0.1",
     "reportlab>=4.4.3",
+    "rlextra>=4.4.3",
+    # rlextra needs rlCgi on Python >= 3.13; it is not on PyPI, only on ReportLab's index.
+    "rlcgi>=2.6.1; python_version >= '3.13'",
     "typer>=0.16.1",
-    "typing-extensions>=4.14.1",
-    "vcfpy>=0.13.8",
 ]
 license = "GPL-3.0-or-later"
 
@@ -35,3 +39,13 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 rpt = ["*.prep", "*.json"]
+
+# rlextra (ReportLab PLUS) is only published on ReportLab's own index.
+[[tool.uv.index]]
+name = "reportlab"
+url = "https://www.reportlab.com/pypi/simple/"
+explicit = true
+
+[tool.uv.sources]
+rlextra = { index = "reportlab" }
+rlcgi = { index = "reportlab" }

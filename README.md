@@ -21,20 +21,55 @@ For each sample, the report includes:
 
 ## Installation
 
-1. Install RPT with [pipx](https://pipx.pypa.io/):
+RPT depends on `rlextra`, which is only available from ReportLab's package index and needs your ReportLab account to download.
+
+```bash
+git clone https://github.com/mhjiang97/rpt.git
+cd rpt
+```
+
+### With uv (recommended)
+
+1. Save your ReportLab credentials for uv (once per machine; you will be asked for the password):
 
    ```bash
-   git clone https://github.com/mhjiang97/rpt.git
-   cd rpt
-
-   pipx install .
+   uv auth login https://www.reportlab.com/pypi/simple/ --username <reportlab-username>
    ```
 
-2. Add `rlextra` to the same environment (you will be asked for your ReportLab credentials):
+2. Install the `rpt` command:
 
    ```bash
-   pipx inject rpt "rlextra[pycairo]" --index-url https://www.reportlab.com/pypi/
+   uv tool install --managed-python .
    ```
+
+   `--managed-python` builds the tool on a uv-managed Python, so Homebrew Python upgrades cannot break it. After pulling new changes, run `uv tool install --managed-python --reinstall .`.
+
+### With pipx
+
+1. Save your ReportLab credentials in `~/.netrc` (once per machine). Use the **username** shown on your [ReportLab account page](https://www.reportlab.com/accounts/) ("for automated installations"), not your email address:
+
+   ```bash
+   cat >> ~/.netrc <<'EOF'
+   machine www.reportlab.com
+   login <reportlab-username>
+   password <reportlab-password>
+   EOF
+   chmod 600 ~/.netrc
+   ```
+
+   pip reads this file automatically. pipx hides pip's output, so pip cannot prompt you for the password during the install.
+
+   > Avoid putting the password in the index URL (`https://<user>:<password>@www.reportlab.com/pypi/...`): pipx stores `--pip-args` in plain text in its metadata so it can reinstall later.
+
+2. Install the `rpt` command:
+
+   ```bash
+   pipx install . --pip-args="--extra-index-url https://www.reportlab.com/pypi/simple/"
+   ```
+
+   pipx remembers the extra index, so `pipx reinstall rpt` and `pipx upgrade rpt` work without repeating it.
+
+pipx environments are tied to the Python they were created with. If that Python is upgraded or removed (*e.g.* by Homebrew), `rpt` stops working with an "invalid interpreter" error; run `pipx reinstall rpt` to rebuild it. To pick the Python version yourself, add `--python 3.13` to the install command.
 
 Without a ReportLab PLUS licence, every page carries an "Evaluation copy of ReportLab PLUS" line at the bottom.
 
@@ -132,15 +167,14 @@ The report is built from the ReportLab RML template [`src/rpt/templates/rpt.prep
 
 ## Development
 
-```bash
-uv sync
-uv pip install "rlextra[pycairo]" --index-url https://www.reportlab.com/pypi/
+Development uses [uv](https://docs.astral.sh/uv/). After saving your ReportLab credentials (see [Installation](#with-uv-recommended)):
 
-# Render the example report from the bundled test data
-PYTHONPATH=src uv run python -m rpt --out-dir tests/output
+```bash
+uv sync                               # create .venv with RPT (editable) and all dependencies
+uv run rpt --out-dir tests/output     # render the example report from the bundled test data
 ```
 
-This writes `tests/output/GYB.pdf` from the data in `tests/data`.
+This writes `tests/output/GYB.pdf` from the data in `tests/data`. Code changes take effect immediately; there is no need to reinstall. Use `uv add` / `uv remove` to change dependencies so that `uv.lock` stays in sync.
 
 ## License
 
